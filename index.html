@@ -3,17 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notes</title>
+    <title>Claude Notion</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Simple Notes</h1>
-        <textarea id="note-input" placeholder="Enter your note here..."></textarea>
-        <button id="add-note-btn">Add Note</button>
-        <div id="notes-container">
-            <!-- Notes will be displayed here -->
-        </div>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <span class="avatar">C</span>
+                    <span class="username">Claude's Workspace</span>
+                </div>
+            </div>
+
+            <div class="sidebar-actions">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Quick Find...">
+                </div>
+                <button id="new-page-btn" class="sidebar-btn">+ New Page</button>
+            </div>
+
+            <nav class="note-list" id="note-list">
+                <!-- 笔记列表将在此动态渲染 -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="export-btn">Settings & Members</button>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="editor-container">
+            <div id="empty-state" class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h2>Select a page or create a new one</h2>
+                <p>Choose from the sidebar to start writing.</p>
+            </div>
+
+            <div id="active-editor" class="active-editor" style="display: none;">
+                <div class="editor-header">
+                    <div class="breadcrumb">Workspace / <span id="current-breadcrumb">Untitled</span></div>
+                    <div class="editor-actions">
+                        <span id="save-status">Saved</span>
+                        <button id="delete-current-btn" title="Delete Page">Delete</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+                    <input type="text" id="note-title" placeholder="Untitled" class="title-input">
+                    <div class="meta-info">
+                        <span id="note-date">February 12, 2026</span>
+                        <span id="word-count">0 words</span>
+                    </div>
+                    <textarea id="note-body" placeholder="Press '/' for commands (just kidding, start typing...)" class="body-input"></textarea>
+                </div>
+            </div>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>

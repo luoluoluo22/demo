@@ -1,81 +1,106 @@
 document.addEventListener('DOMContentLoaded', () => {
     const noteInput = document.getElementById('note-input');
+    const colorSelect = document.getElementById('color-select');
     const addNoteBtn = document.getElementById('add-note-btn');
     const notesContainer = document.getElementById('notes-container');
+    const searchInput = document.getElementById('search-input');
+    const exportBtn = document.getElementById('export-btn');
+    const noteCountEl = document.getElementById('note-count');
+    const wordCountEl = document.getElementById('word-count');
 
-    // Load notes from local storage
-    loadNotes();
+    let notes = JSON.parse(localStorage.getItem('claude-notes-pro')) || [];
 
-    addNoteBtn.addEventListener('click', () => {
-        const noteText = noteInput.value.trim();
-        if (noteText !== '') {
-            addNote(noteText);
-            noteInput.value = ''; // Clear input field
-        }
-    });
+    const updateStats = () => {
+        noteCountEl.textContent = notes.length;
+        const totalWords = notes.reduce((sum, note) => {
+            return sum + (note.text.trim() ? note.text.trim().split(/\s+/).length : 0);
+        }, 0);
+        wordCountEl.textContent = totalWords;
+    };
 
-    function addNote(text, isLoad = false) {
-        const noteId = `note-${Date.now()}`;
-        const noteElement = createNoteElement(noteId, text);
-        notesContainer.appendChild(noteElement);
+    const saveNotes = () => {
+        localStorage.setItem('claude-notes-pro', JSON.stringify(notes));
+        updateStats();
+    };
 
-        if (!isLoad) {
-            saveNoteToLocalStorage(noteId, text);
-        }
-    }
-
-    function createNoteElement(id, text) {
+    const createNoteElement = (note) => {
         const noteDiv = document.createElement('div');
-        noteDiv.classList.add('note');
-        noteDiv.setAttribute('id', id);
+        noteDiv.className = `note ${note.color}`;
+        noteDiv.innerHTML = `
+            <div class="note-content">${escapeHTML(note.text)}</div>
+            <div class="note-footer">
+                <span class="note-date">${note.date}</span>
+                <button class="delete-btn" data-id="${note.id}">Delete</button>
+            </div>
+        `;
 
-        const noteText = document.createElement('p');
-        noteText.textContent = text;
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.classList.add('delete-btn');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.addEventListener('click', () => {
-            deleteNote(id);
+        noteDiv.querySelector('.delete-btn').addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-id');
+            notes = notes.filter(n => n.id != id);
+            saveNotes();
+            renderNotes();
         });
 
-        noteDiv.appendChild(noteText);
-        noteDiv.appendChild(deleteBtn);
-
         return noteDiv;
-    }
+    };
 
-    function saveNoteToLocalStorage(id, text) {
-        const notes = getNotesFromLocalStorage();
-        notes[id] = text;
-        localStorage.setItem('simple-notes', JSON.stringify(notes));
-    }
+    const renderNotes = (filter = '') => {
+        notesContainer.innerHTML = '';
+        const filteredNotes = notes.filter(n =>
+            n.text.toLowerCase().includes(filter.toLowerCase())
+        );
 
-    function getNotesFromLocalStorage() {
-        const notesJSON = localStorage.getItem('simple-notes');
-        return notesJSON ? JSON.parse(notesJSON) : {};
-    }
+        filteredNotes.sort((a, b) => b.id - a.id).forEach(note => {
+            notesContainer.appendChild(createNoteElement(note));
+        });
+        updateStats();
+    };
 
-    function loadNotes() {
-        const notes = getNotesFromLocalStorage();
-        for (const id in notes) {
-            if (notes.hasOwnProperty(id)) {
-                addNote(notes[id], true /* isLoad */);
-            }
-        }
-    }
+    const addNote = () => {
+        const text = noteInput.value.trim();
+        if (!text) return;
 
-    function deleteNote(id) {
-        const noteElement = document.getElementById(id);
-        if (noteElement) {
-            notesContainer.removeChild(noteElement);
-            removeNoteFromLocalStorage(id);
-        }
-    }
+        const newNote = {
+            id: Date.now(),
+            text: text,
+            color: colorSelect.value,
+            date: new Date().toLocaleString()
+        };
 
-    function removeNoteFromLocalStorage(id) {
-        const notes = getNotesFromLocalStorage();
-        delete notes[id];
-        localStorage.setItem('simple-notes', JSON.stringify(notes));
-    }
+        notes.push(newNote);
+        saveNotes();
+        renderNotes();
+        noteInput.value = '';
+        noteInput.focus();
+    };
+
+    const escapeHTML = (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    };
+
+    // Events
+    addNoteBtn.addEventListener('click', addNote);
+
+    noteInput.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') addNote();
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        renderNotes(e.target.value);
+    });
+
+    exportBtn.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `notes_export_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // Initial Render
+    renderNotes();
 });
