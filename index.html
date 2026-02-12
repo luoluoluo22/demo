@@ -2,64 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Claude Notion</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
-        <!-- 侧边栏 -->
-        <aside class="sidebar">
+        <!-- 移动端菜单切换按钮 -->
+        <button id="mobile-menu-toggle" class="mobile-only">☰</button>
+
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-info">
                     <span class="avatar">C</span>
-                    <span class="username">Claude's Workspace</span>
+                    <span class="username">Claude's Notion</span>
                 </div>
             </div>
 
             <div class="sidebar-actions">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Quick Find...">
-                </div>
+                <input type="text" id="search-input" placeholder="Quick Find...">
                 <button id="new-page-btn" class="sidebar-btn">+ New Page</button>
             </div>
 
             <nav class="note-list" id="note-list">
-                <!-- 笔记列表将在此动态渲染 -->
+                <!-- Notes injected here -->
             </nav>
-
-            <div class="sidebar-footer">
-                <button id="export-btn">Settings & Members</button>
-            </div>
         </aside>
 
-        <!-- 主内容区 -->
         <main class="editor-container">
             <div id="empty-state" class="empty-state">
                 <div class="empty-icon">📝</div>
-                <h2>Select a page or create a new one</h2>
-                <p>Choose from the sidebar to start writing.</p>
+                <h2>Select or create a page</h2>
             </div>
 
             <div id="active-editor" class="active-editor" style="display: none;">
-                <div class="editor-header">
+                <header class="editor-header">
                     <div class="breadcrumb">Workspace / <span id="current-breadcrumb">Untitled</span></div>
                     <div class="editor-actions">
                         <span id="save-status">Saved</span>
-                        <button id="delete-current-btn" title="Delete Page">Delete</button>
+                        <button id="delete-current-btn">Delete</button>
                     </div>
-                </div>
-                <div class="editor-content">
+                </header>
+                <article class="editor-content">
                     <input type="text" id="note-title" placeholder="Untitled" class="title-input">
                     <div class="meta-info">
-                        <span id="note-date">February 12, 2026</span>
+                        <span id="note-date"></span>
                         <span id="word-count">0 words</span>
                     </div>
-                    <textarea id="note-body" placeholder="Press '/' for commands (just kidding, start typing...)" class="body-input"></textarea>
-                </div>
+                    <textarea id="note-body" placeholder="Start writing..." class="body-input"></textarea>
+                </article>
             </div>
         </main>
+
+        <!-- 移动端遮罩层 -->
+        <div id="sidebar-overlay" class="mobile-only"></div>
     </div>
     <script src="script.js"></script>
 </body>
