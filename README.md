@@ -4,6 +4,7 @@ This project is a simple web-based note-taking application. It allows users to q
 
 ## Features
 
+*   **Claude Integration:** This project was updated by Claude Code!
 *   **Create Notes:** Add new notes using a simple text area.
 *   **View Notes:** Display all saved notes.
 *   **Delete Notes:** Remove notes that are no longer needed.
